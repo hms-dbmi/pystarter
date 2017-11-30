@@ -44,6 +44,7 @@ def test(ctx, watch=False, last_failing=False, no_flake=False, k=''):
 
 @task
 def flake(ctx):
+    '''static linter to ensure code passes standards'''
     """Run flake8 on codebase."""
     run('flake8 .', echo=True)
     print("flake8 passed!!!")
@@ -51,6 +52,7 @@ def flake(ctx):
 
 @task
 def clean(ctx):
+    '''remove temporary build stuff'''
     run("rm -rf build")
     run("rm -rf dist")
     run("rm -rf *.egg-info")
@@ -60,6 +62,7 @@ def clean(ctx):
 
 @task
 def deploy(ctx, version=None, local=False):
+    '''clean, run tests, version, tag and push tag to git for publishing to pypi through travis'''
     print("preparing for deploy...")
     print("first lets clean everythign up.")
     clean(ctx)
@@ -78,7 +81,8 @@ def deploy(ctx, version=None, local=False):
 
 @task
 def update_version(ctx, version=None):
-    from dcicutils._version import __version__
+    '''update version of your library to be used in pypi'''
+    from sample._version import __version__
     print("Current version is ", __version__)
     if version is None:
         msg = "What version would you like to set for new release (please use x.x.x / semantic versioning): "
@@ -105,6 +109,7 @@ def update_version(ctx, version=None):
 
 @task
 def git_tag(ctx, tag_name, msg):
+    """create a tag and push to github.  Will trigger pypi publish if travis is setup"""
     run('git tag -a %s -m "%s"' % (tag_name, msg))
     run('git push --tags')
     run('git push')
@@ -112,11 +117,13 @@ def git_tag(ctx, tag_name, msg):
 
 @task
 def clean_docs(ctx):
+    """clean all generated docs"""
     run("rm -rf %s" % build_dir, echo=True)
 
 
 @task
 def browse_docs(ctx):
+    """show the generated docs in a webbrowser"""
     path = os.path.join(build_dir, 'index.html')
     webbrowser.open_new_tab(path)
 
@@ -149,6 +156,7 @@ def watch_docs(ctx):
 
 @task
 def browse_cov(ctx, norun=False):
+    '''View test coverage results in browser'''
     if not norun:
         try:
             test(ctx)

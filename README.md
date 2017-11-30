@@ -3,6 +3,14 @@
 This is a starter repo, use this to get started with a new python project and get stuff like automated builds, tests, publish to pypi etc...
 Out of the box for free.
 
+## helpful commands
+
+list all commands
+```
+invoke -l
+```
+
+read help from there.
 
 ## quickstart
 
@@ -14,9 +22,47 @@ $ cd pystarter
 $ rm -rf .git
 $ pip install -r requirments-dev.txt
 $ echo "basic environment setup, your good to go"
-$ echo "git remote add origin https://github.com/hms-dbmi/<your_repo_name>.git"
-$ echo "git push -u origin master"
+$ git remote add origin https://github.com/hms-dbmi/<your_repo_name>.git
+$ git push -u origin master
+$ echo "See configure section in README.md"
 ```
 
-# Configure
+## Configure
+
+This setup assumes your project is in the folder called sample.  You should change the name of 
+sample to be the name of your project and put all you code in that directory.  Also change:
+
+setup.py/setup   (bottom of file)
+
+As below
+name='name of code diretory / project
+packages=['put name of code directory here']
+
+change whatever other details you deem appropriate.
+
+NOTE: you will have to keep `setup.requires` up to date with the libraries you use for your project if
+you want auto pypi deployment to work.
+
+** ALSO CHANGE ***
+
+in `tasks.py/update_version` probably close to line 82 there is a line like:
+
+```
+from sample._version import __version__
+```
+
+here you need to swap sample with name of your code directory
+
+## More Info
+
+- Tests use pytest.  Put all your unit tests in the tests folder, name them test_somthing.py.  Each test
+function should start with the name test_ .  That's it, test away and be merry. :)
+
+- This repo is also already pre-configured to run CI tests with travis.  So anything in your tests folder will get
+ran each time you push code to github.  You need to make sure your new repo is enabled in travis however for this to happen.
+
+- Publish will publish your code to pypi / cheese shop for easy sharing with the world
+
+
+
 
