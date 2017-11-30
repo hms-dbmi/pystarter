@@ -45,10 +45,10 @@ you want auto pypi deployment to work.
 
 ** ALSO CHANGE ***
 
-in `tasks.py/update_version` probably close to line 82 there is a line like:
+in `tasks.py` near the top probably close to line 12
 
 ```
-from sample._version import __version__
+PROJECT_NAME = 'sample'
 ```
 
 here you need to swap sample with name of your code directory

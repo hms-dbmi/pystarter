@@ -3,11 +3,53 @@ import os
 import sys
 import webbrowser
 from invoke.exceptions import UnexpectedExit
-
+from contextlib import contextmanager
 from invoke import task, run
 
 docs_dir = 'docs'
 build_dir = os.path.join(docs_dir, '_build')
+ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
+PROJECT_NAME = 'sample'
+
+
+@contextmanager
+def setenv(**kwargs):
+    # Backup
+    prev = {}
+    for k, v in kwargs.items():
+        if k in os.environ:
+            prev[k] = os.environ[k]
+        os.environ[k] = v
+
+    yield
+
+    # Restore
+    for k in kwargs.keys():
+        if k in prev:
+            os.environ[k] = prev[k]
+        else:
+            del os.environ[k]
+
+
+@task(aliases=['notebooks'])
+def notebook(ctx):
+    """
+    Start IPython notebook server.
+    """
+    with setenv(PYTHONPATH='{root}/{prj}:{root}:{root}/tests'.format(root=ROOT_DIR, prj=PROJECT_NAME),
+                JUPYTER_CONFIG_DIR='{root}/notebooks'.format(root=ROOT_DIR)):
+
+        os.chdir('notebooks')
+
+        # Need pty=True to let Ctrl-C kill the notebook server. Shrugs.
+        try:
+            run('jupyter nbextension enable --py widgetsnbextension')
+            run('jupyter notebook --ip=*', pty=True)
+        except KeyboardInterrupt:
+            pass
+        print("If notebook does not open on your chorme automagically, try adding this to your bash_profie")
+        print("export BROWSER=/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome")
+        print("*for MacOS and Chrome only")
 
 
 @task
@@ -82,8 +124,9 @@ def deploy(ctx, version=None, local=False):
 @task
 def update_version(ctx, version=None):
     '''update version of your library to be used in pypi'''
-    from sample._version import __version__
-    print("Current version is ", __version__)
+    import importlib
+    vmod = importlib.import_module('%s._version' % PROJECT_NAME)
+    print("Current version is ", vmod.__version__)
     if version is None:
         msg = "What version would you like to set for new release (please use x.x.x / semantic versioning): "
         if sys.version_info < (3, 0):
@@ -93,15 +136,15 @@ def update_version(ctx, version=None):
 
     # read the versions file
     lines = []
-    with open("dcicutils/_version.py") as readfile:
+    with open(PROJECT_NAME + "/_version.py") as readfile:
         lines = readfile.readlines()
 
     if lines:
-        with open("dcicutils/_version.py", 'w') as writefile:
+        with open(PROJECT_NAME + "/_version.py", 'w') as writefile:
             lines[-1] = '__version__ = "%s"\n' % (version.strip())
             writefile.writelines(lines)
 
-    run("git add dcicutils/_version.py")
+    run("git add %s/_version.py" % PROJECT_NAME)
     run("git commit -m 'version bump'")
     print("version updated to", version)
     return version
