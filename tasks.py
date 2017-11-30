@@ -5,6 +5,10 @@ import webbrowser
 from invoke.exceptions import UnexpectedExit
 from contextlib import contextmanager
 from invoke import task, run
+import cProfile
+import pstats
+import importlib
+
 
 docs_dir = 'docs'
 build_dir = os.path.join(docs_dir, '_build')
@@ -218,3 +222,27 @@ def publish(ctx, test=False):
     else:
         run('python setup.py register sdist bdist_wheel', echo=True)
         run('twine upload dist/*', echo=True)
+
+
+@task
+def profile(ctx, module, method, filename=None):
+    '''
+    run modeule.method through the profile and dump results to filename
+    '''
+
+    mod = importlib.import_module(module)
+    fn = getattr(mod, method)
+    pr = cProfile.Profile()
+    pr.enable()
+    res = fn()
+    pr.disable()
+    if res:
+        print(res)
+    pr.create_stats()
+    ps = pstats.Stats(pr).sort_stats('time')
+    ps.print_stats()
+    ps.print_callers()
+    ps.print_callees()
+    if filename is not None:
+        ps.dump_stats(filename)
+
