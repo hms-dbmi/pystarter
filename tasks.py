@@ -245,4 +245,3 @@ def profile(ctx, module, method, filename=None):
     ps.print_callees()
     if filename is not None:
         ps.dump_stats(filename)
-
