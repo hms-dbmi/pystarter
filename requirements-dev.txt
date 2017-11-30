@@ -1,0 +1,19 @@
+# unit tets
+pytest
+pytest-cov
+pytest-mock
+
+# Build tasks
+invoke
+
+# Packaging
+wheel
+twine
+
+# Syntax checking
+flake8
+
+# Documentation builder
+# sphinx-autobuild
+# sphinx
+
