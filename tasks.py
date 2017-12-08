@@ -59,6 +59,7 @@ def notebook(ctx):
 @task()
 def share_notebook(ctx, branch='master'):
     # get git repo called origin
+    print("sharing from github repo, NOT local")
     repo = run('git remote get-url origin').stdout.strip('\n')
     if not repo.startswith("http"):
         # ssh like git@github.com:org/name
@@ -67,7 +68,7 @@ def share_notebook(ctx, branch='master'):
     org, name = repo.split('/')[-2:]
 
     # https://mybinder.org/v2/gh/hms-dbmi/pystarter.git/master
-    url = "https://mybinder.org/v2/gh/%s/%s/%s" % (org, name, branch)
+    url = "https://mybinder.org/v2/gh/%s/%s/%s?filepath=notebooks" % (org, name, branch)
     print("Notebook can be accessed from here %s" % url)
     webbrowser.open_new_tab(url)
 
