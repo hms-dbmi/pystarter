@@ -56,6 +56,22 @@ def notebook(ctx):
         print("*for MacOS and Chrome only")
 
 
+@task()
+def share_notebook(ctx, branch='master'):
+    # get git repo called origin
+    repo = run('git remote get-url origin').stdout.strip('\n')
+    if not repo.startswith("http"):
+        # ssh like git@github.com:org/name
+        repo = repo.split(':')[-1]
+
+    org, name = repo.split('/')[-2:]
+
+    # https://mybinder.org/v2/gh/hms-dbmi/pystarter.git/master
+    url = "https://mybinder.org/v2/gh/%s/%s/%s" % (org, name, branch)
+    print("Notebook can be accessed from here %s" % url)
+    webbrowser.open_new_tab(url)
+
+
 @task
 def loc(ctx):
     """
