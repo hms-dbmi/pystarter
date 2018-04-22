@@ -22,7 +22,10 @@ cd pystarter
 rm -rf .git
 pip install -r requirments-dev.txt
 echo "basic environment set up, you are good to go"
+git init .
 git remote add origin https://github.com/hms-dbmi/<your_repo_name>.git
+git add .
+git commit -m "initial repo setup before customization"
 git push -u origin master
 echo "See configure section in README.md"
 ```
